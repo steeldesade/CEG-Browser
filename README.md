@@ -111,7 +111,7 @@ units/other/ceg_test_projectile.lua (dummy projectile carrier unit)
   - Handles projectile physics, impact dispatch, and cleanup
 
 - **ceg_test_projectile.lua**
-  - Invisible, non-interactive helper unit
+  - Non-interactive helper unit
   - Exists only to legally emit test projectiles
   - Never selectable, controllable, or persistent
   - Safe for repeated spawning and cleanup
@@ -147,7 +147,6 @@ units/
 ## License
 
 This project is provided as a development tool for the BAR community.  
-License information may be added or updated by the author.
 
 ---
 
