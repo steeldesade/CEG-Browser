@@ -96,7 +96,7 @@ units/other/ceg_test_projectile.lua (dummy projectile carrier unit)
 
 ### Dependency Roles
 
-- **gui_ceg_browser.lua**
+- **Luaui/widgets/gui_ceg_browser.lua**
   - UI layer
   - Handles selection, filtering, tuning, and input
   - Sends commands to LuaRules
@@ -110,7 +110,7 @@ units/other/ceg_test_projectile.lua (dummy projectile carrier unit)
   - Spawns test projectiles and ground CEGs
   - Handles projectile physics, impact dispatch, and cleanup
 
-- **ceg_test_projectile.lua**
+- **Units/other/ceg_test_projectile.lua**
   - Non-interactive helper unit
   - Exists only to legally emit test projectiles
   - Never selectable, controllable, or persistent
