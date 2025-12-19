@@ -2,7 +2,9 @@
 
 **Author:** Steel  
 **Type:** Developer / Artist Tool
+
 **Date:** 2025.12.18
+
 **Status:** Developer environment only (not compatible with the standard public BAR release)
 
 ---
