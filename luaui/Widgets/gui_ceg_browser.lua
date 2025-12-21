@@ -1316,11 +1316,18 @@ function widget:MousePress(mx, my, button)
 
 
         local rb = hitBoxes.reloadBtn
-        if rb and mx>=rb.x0 and mx<=rb.x1 and my>=rb.y0 and my<=rb.y1 then
-            LoadAllCEGs()
-            RebuildFiltered()
-            return true
-        end
+	if rb and mx>=rb.x0 and mx<=rb.x1 and my>=rb.y0 and my<=rb.y1 then
+    	    -- 1) Force engine to reparse CEG definitions
+    	    spSendCommands("reloadcegs")
+
+    	    -- 2) Reload lookup + browser list
+    	    LoadAllCEGs()
+    	    RebuildFiltered()
+
+    	    spEcho("[CEG Browser] Reloaded CEGs (engine + browser)")
+    	    return true
+	end
+
         local tbx = hitBoxes.tuningBtn
 	if tbx and mx>=tbx.x0 and mx<=tbx.x1 and my>=tbx.y0 and my<=tbx.y1 then
     	    settingsMode = "ceg"
