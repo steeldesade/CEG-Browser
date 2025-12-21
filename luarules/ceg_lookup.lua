@@ -41,19 +41,38 @@
 --
 --------------------------------------------------------------------------------
 
-
 local CEGLookup = {}
 
 local EFFECTS_DIR = "effects"
 
+--------------------------------------------------------------------------------
+-- Recursive directory scan
+--------------------------------------------------------------------------------
+local function scanDirRecursive(dir, files)
+  -- collect lua files in this directory
+  local luaFiles = VFS.DirList(dir, "*.lua") or {}
+  for _, path in ipairs(luaFiles) do
+    table.insert(files, path)
+  end
+
+  -- recurse into sub-directories
+  local subDirs = VFS.SubDirs(dir) or {}
+  for _, subDir in ipairs(subDirs) do
+    scanDirRecursive(subDir, files)
+  end
+end
+
+--------------------------------------------------------------------------------
+-- Scan effects (recursive)
+--------------------------------------------------------------------------------
 local function scanEffects()
   local byName   = {}
   local byFile   = {}
   local nameList = {}
+  local files    = {}
 
-  -- NOTE: if this ever misses subdirectories, you can try:
-  --   VFS.DirList(EFFECTS_DIR, "*.lua", VFS.RAW_FIRST, true)
-  local files = VFS.DirList(EFFECTS_DIR, "*.lua") or {}
+  -- recursive scan (FIX)
+  scanDirRecursive(EFFECTS_DIR, files)
 
   for _, path in ipairs(files) do
     local short = path:match("([^/]+)%.lua$") or path
@@ -61,6 +80,7 @@ local function scanEffects()
     local ok, defs = pcall(VFS.Include, path)
     if ok and type(defs) == "table" then
       byFile[short] = byFile[short] or {}
+
       for cegName, def in pairs(defs) do
         if type(cegName) == "string" and not byName[cegName] then
           byName[cegName] = {
@@ -72,7 +92,11 @@ local function scanEffects()
         end
       end
     elseif Spring and Spring.Echo then
-      Spring.Echo(string.format("[ceg_lookup] Failed to include %s: %s", path, tostring(defs)))
+      Spring.Echo(string.format(
+        "[ceg_lookup] Failed to include %s: %s",
+        path,
+        tostring(defs)
+      ))
     end
   end
 
@@ -88,6 +112,9 @@ local function scanEffects()
   }
 end
 
+--------------------------------------------------------------------------------
+-- Cache + API
+--------------------------------------------------------------------------------
 local cache = scanEffects()
 
 function CEGLookup.GetAllNames()
