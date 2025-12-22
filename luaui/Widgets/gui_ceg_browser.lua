@@ -341,6 +341,7 @@ end
 --------------------------------------------------------------------------------
 -- Fire mode
 local fireArmed = false
+local groundArmed = false
 --------------------------------------------------------------------------------
 
 local CFG_WIN_X = "ceg_proj_preview_lua_win_x"
@@ -833,7 +834,7 @@ function widget:DrawScreen()
 
     -- Row 2
     DrawButton(c1x0, row2Y0, c1x1, row2Y1, "Reload CEGs", false, false, theme.fontSize.button)
-    DrawButton(c2x0, row2Y0, c2x1, row2Y1, "GROUND", settingsMode == "ceg", false, theme.fontSize.button)
+    DrawButton(c2x0, row2Y0, c2x1, row2Y1, groundArmed and "ARMED" or "GROUND", groundArmed, false, theme.fontSize.button)
 
     hitBoxes.reloadBtn = {id="reload", x0=c1x0,y0=row2Y0,x1=c1x1,y1=row2Y1}
     hitBoxes.tuningBtn = {id="tuning", x0=c2x0,y0=row2Y0,x1=c2x1,y1=row2Y1}
@@ -843,7 +844,7 @@ function widget:DrawScreen()
     DrawButton(
         c2x0, row3Y0, c2x1, row3Y1,
         fireArmed and "ARMED" or "PROJECTILE",
-        settingsMode == "projectile",
+        fireArmed,
         false,
         theme.fontSize.button
     )
@@ -1329,19 +1330,29 @@ function widget:MousePress(mx, my, button)
 	end
 
         local tbx = hitBoxes.tuningBtn
-	if tbx and mx>=tbx.x0 and mx<=tbx.x1 and my>=tbx.y0 and my<=tbx.y1 then
-    	    settingsMode = "ceg"
-            fireArmed = false
-    	    return true
-	end
+        if tbx and mx>=tbx.x0 and mx<=tbx.x1 and my>=tbx.y0 and my<=tbx.y1 then
+            if groundArmed then
+                -- disarming ground: fully exit ground spawn mode
+                groundArmed = false
+                settingsMode = nil
+            else
+                -- arming ground
+                settingsMode = "ceg"
+                groundArmed = true
+                fireArmed   = false
+            end
+            Spring.Echo("[CEG Browser] Ground mode: " .. (groundArmed and "ARMED" or "OFF"))
+            return true
+        end
 
         local fb = hitBoxes.fireBtn
-	if fb and mx>=fb.x0 and mx<=fb.x1 and my>=fb.y0 and my<=fb.y1 then
-    	    settingsMode = "projectile"
-    	    fireArmed = not fireArmed
-    	    Spring.Echo("[CEG Proj Preview] Fire mode: " .. (fireArmed and "ON" or "OFF"))
-    	    return true
-	end
+        if fb and mx>=fb.x0 and mx<=fb.x1 and my>=fb.y0 and my<=fb.y1 then
+            settingsMode = "projectile"
+            fireArmed   = not fireArmed
+            groundArmed = false
+            Spring.Echo("[CEG Proj Preview] Fire mode: " .. (fireArmed and "ON" or "OFF"))
+            return true
+        end
 
 
         for _,ab in ipairs(hitBoxes.alphaButtons or {}) do
