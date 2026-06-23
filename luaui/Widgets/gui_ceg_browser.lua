@@ -849,6 +849,10 @@ end
 function widget:Shutdown()
     spSetConfigInt(CFG_WIN_X, winX or 0)
     spSetConfigInt(CFG_WIN_Y, winY or 0)
+    -- Ensure SDL text input mode doesn't leak if widget is closed while a search is focused
+    if searchFocused or (SoundPanelState and SoundPanelState.searchFocused) then
+        Spring.SDLStopTextInput()
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -1991,10 +1995,13 @@ function widget:MousePress(mx, my, button)
             local s = hb and hb.search
             if s and mx>=s.x0 and mx<=s.x1 and my>=s.y0 and my<=s.y1 then
                 SoundPanelState.searchFocused = true
+                Spring.SDLStartTextInput()
                 -- unfocus browser search if any
+                if searchFocused then Spring.SDLStopTextInput() end
                 searchFocused = false
                 return true
             else
+                if SoundPanelState.searchFocused then Spring.SDLStopTextInput() end
                 SoundPanelState.searchFocused = false
             end
 
@@ -2194,8 +2201,10 @@ function widget:MousePress(mx, my, button)
         end
         if sb and mx>=sb.x0 and mx<=sb.x1 and my>=sb.y0 and my<=sb.y1 then
             searchFocused = true
+            Spring.SDLStartTextInput()
             return true
         else
+            if searchFocused then Spring.SDLStopTextInput() end
             searchFocused = false
         end
 
@@ -2700,6 +2709,7 @@ function widget:KeyPress(key, mods, isRepeat)
         end
         if key == 27 then -- esc
             SoundPanelState.searchFocused = false
+            Spring.SDLStopTextInput()
             return true
         end
     end
@@ -2713,6 +2723,13 @@ function widget:KeyPress(key, mods, isRepeat)
             return true
         end
         if key == 13 then -- enter
+            searchFocused = false
+            Spring.SDLStopTextInput()
+            return true
+        end
+        if key == 27 then -- esc
+            searchFocused = false
+            Spring.SDLStopTextInput()
             return true
         end
         return true

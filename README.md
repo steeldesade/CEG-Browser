@@ -70,6 +70,7 @@ This tool is intended for:
 - CTRL + drag for fine slider adjustments
 - ALT + hover to reveal full CEG names
 - Clean separation between trail and impact selection
+- Search fields use SDL text input mode (start/stop on focus/blur) to prevent chat interference from blocking keyboard input
 
 
 ### CEG INFO Panel
@@ -112,7 +113,7 @@ the game after each change.
 
 **What it does**
 
-* Browse and search weapon sounds
+* Browse and search weapon sounds (search field uses SDL text input mode — same fix as CEG panel)
 * Only looks in sound/weapons, sound/bombs, sounds/weapons-mult for weapon related sounds
 * Select:
 
